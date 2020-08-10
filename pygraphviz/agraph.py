@@ -243,8 +243,8 @@ class AGraph:
         return f"<AGraph {name} {self.handle}>"
 
     def __eq__(self, other):
-        # two graphs are equal if they have exact same string representation
-        # this is not graph isomorphism
+        # two graphs are equal if they have exact same nodes and edges
+        # and attributes.  This is not graph isomorphism
         if self.nodes() != other.nodes():
             return False
         if self.edges() != other.edges():
@@ -252,6 +252,8 @@ class AGraph:
         if [n.attr for n in self.nodes()] != [n.attr for n in other.nodes()]:
             return False
         if [e.attr for e in self.edges()] != [e.attr for e in other.edges()]:
+            return False
+        if self.graph_attr != other.graph_attr:
             return False
         return True
 
