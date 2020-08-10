@@ -4,12 +4,6 @@ import pygraphviz as pgv
 
 stringify = pgv.testing.stringify
 
-#def stringify(agraph):
-#    result = agraph.string().split()
-#    if '""' in result:
-#        result.remove('""')
-#    return " ".join(result)
-
 
 class TestGraph(unittest.TestCase):
     def setUp(self):
@@ -64,6 +58,14 @@ class TestGraph(unittest.TestCase):
         H = pgv.AGraph()
         assert H == A
         assert H is not A
+
+        assert self.P3 == self.P3
+        A = pgv.AGraph()
+        A.add_path([1, 2, 3])
+        assert A.nodes() == self.P3.nodes()
+        assert A.edges() == self.P3.edges()
+        assert stringify(A) == stringify(self.P3)
+        assert A == self.P3
 
     def test_iter(self):
         assert sorted(list(self.P3.__iter__())) == ["1", "2", "3"]
@@ -221,22 +223,13 @@ class TestGraph(unittest.TestCase):
         assert A.nodes() == []
         assert A.edges() == []
 
-    def test_eq(self):
-        assert self.P3 == self.P3
-        A = pgv.AGraph()
-        A.add_path([1, 2, 3])
-        assert A.nodes() == self.P3.nodes()
-        assert A.edges() == self.P3.edges()
-        assert A.string() == self.P3.string()
-        assert A == self.P3
-
     def test_copy(self):
         A = self.P3.copy()
         assert A.nodes() == ["1", "2", "3"]
         assert A.edges() == [("1", "2"), ("2", "3")]
         assert A is not self.P3
         assert self.P3 is self.P3
-        assert A.string() == self.P3.string()
+        assert stringify(A) == stringify(self.P3)
         assert A == self.P3
 
     def test_add_path(self):
