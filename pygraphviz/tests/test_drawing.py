@@ -66,6 +66,9 @@ def test_drawing_to_create_dot_string():
     assert "pos" in dot_rep
     assert "height" in dot_rep
     assert "width" in dot_rep
+    assert "1 -- 2" in dot_rep
+    assert "2 -- 3" in dot_rep
+    assert "3 -- 4" in dot_rep
 
     # unfortunately, the layout and dot outcomes vary
     # with system and graphviz version. One example is

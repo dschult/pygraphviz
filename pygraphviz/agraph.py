@@ -1568,10 +1568,12 @@ class AGraph:
             raise ValueError(f"Can't find prog={prog} in this graphviz installation")
 
         # Render
-        with self._get_fh(path, mode="w+b") as fh:
-            err = gv.gvRender(gvc, G, format, fh)
-            if err:
-                raise ValueError("Graphviz raised a render error. Maybe bad format?")
+        fh = self._get_fh(path, mode="w+b")
+        err = gv.gvRender(gvc, G, format, fh)
+        if err:
+            raise ValueError("Graphviz raised a render error. Maybe bad format?")
+        if is_string_like(path):
+            fh.close()
         gv.gvFreeContext(gvc)
 
 
