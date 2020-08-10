@@ -1252,10 +1252,11 @@ class AGraph:
                 fh.close()
 
     def string_nop(self):
-        """Return a string (unicode) representation of graph in dot format."""
-        # this will fail for graphviz-2.8 because of a broken nop
-        # so use tempfile version in to_string below
-#        return self.draw(format="dot", prog="nop").decode(self.encoding)
+        """Return a string (unicode) representation of graph in dot format.
+
+        This version of string does layout with nop and renderis to "dot".
+        The regular `string()` uses agwrite to produce "dot" without rendering.
+        """
         gvc = gv.gvContext()
         gv.gvLayout(gvc, self.handle, b"nop")
         ans = gv.gvRenderData(gvc, self.handle, b"dot")
@@ -1266,8 +1267,12 @@ class AGraph:
         gv.gvFreeContext(gvc)
         return dot_string.decode(self.encoding)
 
-    def to_string_via_temporaryfile(self):
-        """Return a string (unicode) representation of graph in dot format."""
+    def to_string(self):
+        """Return a string (unicode) representation of graph in dot format.
+
+        This version of string uses agwrite to produce "dot" without rendering.
+        The function `string_nop()` does layout with nop and renders to "dot".
+        """
         from tempfile import TemporaryFile
 
         fh = TemporaryFile()
@@ -1277,24 +1282,9 @@ class AGraph:
         fh.close()
         return data.decode(self.encoding)
 
-    def to_string(self):
-        """Return a string (unicode) representation of graph in dot format."""
-        from tempfile import TemporaryFile
-
-        fh = TemporaryFile()
-        # Cover TemporaryFile wart: on 'nt' we need the file member
-        if hasattr(fh, "file"):
-            self.write(fh.file)
-        else:
-            self.write(fh)
-        fh.seek(0)
-        data = fh.read()
-        fh.close()
-        return data.decode(self.encoding)
-
     def string(self):
         """Return a string (unicode) representation of graph in dot format."""
-        return self.string_nop()
+        return self.to_string()
 
     def from_string(self, string):
         """Load a graph from a string in dot format.
@@ -1483,36 +1473,20 @@ class AGraph:
         if is_string_like(prog):
             prog = prog.encode(self.encoding)
 
-#        gvc = gv.gvContext()
-#        gv.gvLayout(gvc, self.handle, prog)
-#        print("Layout Done")
-#        print(self.to_string())
-#        gv.gvRender(gvc, self.handle, b"dot", None)
-#        print("WRITING LAYOUT TO AGRAPH")
-#        print(self.to_string())
-#        gv.gvFreeLayout(gvc, self.handle)
-#        gv.gvFreeContext(gvc)
-
         if is_string_like(format):
             format = format.encode(self.encoding)
-#        if is_string_like(path):
-#            path = path.encode(self.encoding)
 
-        #path = b"simple.png"
         gvc = gv.gvContext()
-        err = gv.gvLayout(gvc, self.handle, prog) #b"nop2")
-        print("Error",err)
+        err = gv.gvLayout(gvc, self.handle, prog)
         if err:
             if err != -1:
                 raise ValueError("Graphviz raised a layout error.")
             prog = prog.decode(self.encoding)
             raise ValueError(f"Can't find prog={prog} in this graphviz installation")
-#        with open(path, "wb") as fh:
         with self._get_fh(path, mode="w+b") as fh:
             err = gv.gvRender(gvc, self.handle, format, fh)
             if err:
                 raise ValueError("Graphviz raised a render error. Maybe bad format?")
-#        gv.gvRenderFilename(gvc, self.handle, format, path)
         gv.gvFreeLayout(gvc, self.handle)
         gv.gvFreeContext(gvc)
 
@@ -1521,8 +1495,7 @@ class AGraph:
         ans = gv.gvRenderData(gvc, self.handle, b"dot")
         gv.gvFreeContext(gvc)
         if ans[0]:  # Error... probably no layout in agraph
-            print("This is from the function to_string_via_temporaryfile")
-            return self.to_string_via_temporaryfile()
+            return self.to_string()
         err, dot_string, length = ans
         assert len(dot_string) == length
         return dot_string.decode(self.encoding)
@@ -1611,32 +1584,6 @@ class AGraph:
             if err:
                 raise ValueError("Graphviz raised a render error. Maybe bad format?")
         gv.gvFreeContext(gvc)
-
-#        # handle writing dot file
-#        if path is None:
-#            print("GVRENDER NO PATH")
-#            from tempfile import TemporaryFile
-#            with TemporaryFile() as ffh:
-##            with io.StringIO() as fh:
-##                fh=open("test_me.dot","w+b")
-##                gv.gvRender(gvc, G, format, fh)
-#                gv.gvRenderFilename(gvc, G, b"dot", b"test_filename.png")
-#                gv.gvFreeContext(gvc)
-##                fh.seek(0)
-##                fh.close()
-#                fh=open("test_filename.dot","w+b")
-#                data = fh.read()
-##                fh.close()
-#            return data.decode(self.encoding)
-
-#        print("GVRENDER WITH PATH")
-#        fh = self._get_fh(path, mode="w+b")
-#        fh = open(path, mode="w+b")
-#        gv.gvRender(gvc, G, format, fh)
-#        gv.gvRenderFilename(gvc, G, format, path.encode(self.encoding))
-#        if is_string_like(path):
-#            fh.close()
-#        gv.gvFreeContext(gvc)
 
 
     def layout_command_line(self, prog="neato", args=""):
