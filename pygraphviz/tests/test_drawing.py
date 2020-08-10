@@ -1,4 +1,4 @@
-from testfile import TemporaryFile
+from tempfile import TemporaryFile
 import pytest
 import pygraphviz as pgv
 
@@ -47,10 +47,13 @@ def test_drawing_makes_file():
 #    print(A.to_string())
     with TemporaryFile() as fh:
         A.draw(fh, format="jpg")
+        assert fh.tell() > 0
     with TemporaryFile() as fh:
         A.draw(fh, format="png", prog="twopi")
+        assert fh.tell() > 0
     with TemporaryFile() as fh:
         A.draw(path=fh, prog="circo", format="png")
+        assert fh.tell() > 0
 
 
 def test_drawing_to_create_dot_string():
