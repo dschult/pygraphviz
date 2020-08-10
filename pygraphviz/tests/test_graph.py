@@ -58,6 +58,10 @@ class TestGraph(unittest.TestCase):
         H = pgv.AGraph()
         assert H == A
         assert H is not A
+        print(repr(H))
+        print(H)
+        print(H.string())
+        assert False
 
         assert self.P3 == self.P3
         A = pgv.AGraph()
