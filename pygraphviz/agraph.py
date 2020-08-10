@@ -1294,7 +1294,7 @@ class AGraph:
 
     def string(self):
         """Return a string (unicode) representation of graph in dot format."""
-        return self.to_string()
+        return self.string_nop()
 
     def from_string(self, string):
         """Load a graph from a string in dot format.
