@@ -235,6 +235,7 @@ class TestGraph(unittest.TestCase):
         assert stringify(A) == stringify(self.P3)
         print(A.string())
         print(self.P3.string())
+        print("The .string methods are the same: ", self.P3.string() == A.string())
         assert A == self.P3
 
     def test_add_path(self):
