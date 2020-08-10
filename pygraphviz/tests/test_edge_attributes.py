@@ -1,11 +1,12 @@
 import pygraphviz as pgv
+from pygraphviz.testing import stringify
 
 
-def stringify(agraph):
-    result = agraph.string().split()
-    if '""' in result:
-        result.remove('""')
-    return " ".join(result)
+#def stringify(agraph):
+#    result = agraph.string().split()
+#    if '""' in result:
+#        result.remove('""')
+#    return " ".join(result)
 
 
 def test_edge_attributes():
