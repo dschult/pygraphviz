@@ -58,17 +58,16 @@ class TestGraph(unittest.TestCase):
         H = pgv.AGraph()
         assert H == A
         assert H is not A
-        print(repr(H))
-        print(H)
-        print(H.string())
-        assert False
 
         assert self.P3 == self.P3
+
         A = pgv.AGraph()
         A.add_path([1, 2, 3])
         assert A.nodes() == self.P3.nodes()
         assert A.edges() == self.P3.edges()
         assert stringify(A) == stringify(self.P3)
+        print(A.string())
+        print(self.P3.string())
         assert A == self.P3
 
     def test_iter(self):
@@ -234,6 +233,8 @@ class TestGraph(unittest.TestCase):
         assert A is not self.P3
         assert self.P3 is self.P3
         assert stringify(A) == stringify(self.P3)
+        print(A.string())
+        print(self.P3.string())
         assert A == self.P3
 
     def test_add_path(self):
