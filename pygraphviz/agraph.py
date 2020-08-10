@@ -997,16 +997,9 @@ class AGraph:
         from tempfile import TemporaryFile
 
         fh = TemporaryFile()
-        # Cover TemporaryFile wart: on 'nt' we need the file member
-        if hasattr(fh, "file"):
-            fhandle = fh.file
-        else:
-            fhandle = fh
-
-        self.write(fhandle)
+        self.write(fh)
         fh.seek(0)
-
-        return self.__class__(filename=fhandle)
+        return self.__class__(filename=fh)
 
     def add_path(self, nlist):
         """Add the path of nodes given in nlist."""
@@ -1309,11 +1302,7 @@ class AGraph:
         fh = TemporaryFile()
         fh.write(string.encode(self.encoding))
         fh.seek(0)
-        # Cover TemporaryFile wart: on 'nt' we need the file member
-        if hasattr(fh, "file"):
-            self.read(fh.file)
-        else:
-            self.read(fh)
+        self.read(fh)
         fh.close()
         return self
 

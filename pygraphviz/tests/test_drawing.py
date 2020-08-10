@@ -1,5 +1,6 @@
-import pygraphviz as pgv
+from testfile import TemporaryFile
 import pytest
+import pygraphviz as pgv
 
 
 def stringify(agraph):
@@ -36,17 +37,20 @@ def test_drawing_error_old():
 #    (fd, fname) = tempfile.mkstemp()
 #    A.draw(fname, format="ps", prog="neato")
 #    A.draw(fname, prog="neato")
+
 def test_drawing_makes_file():
     A = pgv.AGraph(name='test graph')
     A.add_path([1, 2, 3, 4])
 #    print(A.to_string())
 #    A.layout()
-#    print("hi", A.has_layout)
-#    print("use dot", A.to_string())
-    A.draw("test_gvRender1.png", prog="twopi")
-    A.draw("test_gvRender.png")
-#    print("all args")
-    A.draw(path="test_gvRender_all.png", prog=b"circo", format="png")
+#    print(A.has_layout)
+#    print(A.to_string())
+    with TemporaryFile() as fh:
+        A.draw(fh, format="jpg")
+    with TemporaryFile() as fh:
+        A.draw(fh, format="png", prog="twopi")
+    with TemporaryFile() as fh:
+        A.draw(path=fh, prog="circo", format="png")
 
 
 def test_drawing_to_create_dot_string():
@@ -54,6 +58,15 @@ def test_drawing_to_create_dot_string():
     A.add_path([1, 2, 3, 4])
     A.layout()
     dot_rep = A.to_string()
+    assert "test graph" in dot_rep
+    assert "strict graph" in dot_rep
+    assert "pos" in dot_rep
+    assert "height" in dot_rep
+    assert "width" in dot_rep
+
+    # unfortunately, the layout and dot outcomes vary
+    # with system and graphviz version. One example is
+    # shown here, the numbers can be very different.
     expected = """strict graph "test graph" {
 	graph [bb="0,0,70.071,250.3"];
 	node [label="\\N"];
@@ -74,8 +87,8 @@ def test_drawing_to_create_dot_string():
 	3 -- 4	[pos="39.322,178.76 38.043,189.53 36.424,203.17 35.14,213.98"];
 }
 """
-    print("dot representation:", dot_rep)
-    assert expected == dot_rep
+    #print("dot representation:", dot_rep)
+    #assert expected == dot_rep
 
 def test_name_error():
     with pytest.raises(ValueError):
