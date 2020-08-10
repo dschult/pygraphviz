@@ -9,6 +9,7 @@
 
 %{
 #include "graphviz/cgraph.h"
+#include "graphviz/gvc.h"
 %}
 
 %{
@@ -33,20 +34,23 @@ if (init_file_emulator() < 0) {
 %}
 
 %typemap(in) FILE* (int fd, PyObject *mode_obj, PyObject *mode_byte_obj, char *mode) {
-    if (!PyObject_IsInstance($input, PyIOBase_TypeObj)) {
-        PyErr_SetString(PyExc_TypeError, "not a file handle");
-        return NULL;
+    if ($input == Py_None) { $1 = NULL; }
+    else {
+        if (!PyObject_IsInstance($input, PyIOBase_TypeObj)) {
+            PyErr_SetString(PyExc_TypeError, "not a file handle");
+            return NULL;
+        }
+        // work around to get hold of FILE*
+        fd = PyObject_AsFileDescriptor($input);
+
+        mode_obj = PyObject_GetAttrString($input, "mode");
+        mode_byte_obj = PyUnicode_AsUTF8String(mode_obj);
+
+        mode = PyBytes_AsString(mode_byte_obj);
+        $1 = fdopen(fd, mode);
+        Py_XDECREF(mode_obj);
+        Py_XDECREF(mode_byte_obj);
     }
-    // work around to get hold of FILE*
-    fd = PyObject_AsFileDescriptor($input);
-
-    mode_obj = PyObject_GetAttrString($input, "mode");
-    mode_byte_obj = PyUnicode_AsUTF8String(mode_obj);
-
-    mode = PyBytes_AsString(mode_byte_obj);
-    $1 = fdopen(fd, mode);
-    Py_XDECREF(mode_obj);
-    Py_XDECREF(mode_byte_obj);
 }
 
 
@@ -231,7 +235,7 @@ int      agsafeset(void *obj, char *name, char *value, char *def);
 
 /* styled from gv.cpp in Graphviz to handle <> html data in label */
 %inline %{
-  int agattr_label(Agraph_t *g, int kind, char *name, char *val)
+  Agsym_t *agattr_label(Agraph_t *g, int kind, char *name, char *val)
 {
     int len;
     char *hs;
@@ -290,6 +294,22 @@ def agnameof(handle):
 %}
 
 
+/* gvLayout and gvRender for layout and rendering of graphs */
+/*   gvc --> GraphViz context, g --> graph           */
+/*   format --> "dot", "ps", "png", "cmap", ...           */
+/*   out --> NULL, homebaked_layout_position_storage, ...           */
+/*   prog --> "dot", "nop", "nop2",            */
+GVC_t *gvContext(void);
+int gvFreeContext(GVC_t *gvc);
+int gvLayout(GVC_t *gvc, Agraph_t *g, char* prog);
+int gvFreeLayout(GVC_t *gvc, Agraph_t *g);
+int gvRender(GVC_t *gvc, Agraph_t* g, char *format, FILE *out=NULL);
+int gvRenderFilename(GVC_t *gvc, Agraph_t* g, char *format, char *filename);
+/* Writing a dit file to a string involves some pointer crazy stuff */
+%include <cstring.i>
+%include <typemaps.i>
+%cstring_output_allocate(char **result, free(*$1)); 
+int gvRenderData(GVC_t *gvc, Agraph_t* g, char *format, char **result, unsigned int *OUTPUT);
 
 
 /* Agdesc_t Agdirected, Agstrictdirected, Agundirected, Agstrictundirected;  */
