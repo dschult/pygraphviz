@@ -245,21 +245,32 @@ class AGraph:
     def __eq__(self, other):
         # two graphs are equal if they have exact same nodes and edges
         # and attributes.  This is not graph isomorphism
-        if self.nodes() != other.nodes():
+        if sorted(self.nodes()) != sorted(other.nodes()):
             return False
-        if self.edges() != other.edges():
+        if sorted(self.edges()) != sorted(other.edges()):
             return False
-        if [n.attr for n in self.nodes()] != [n.attr for n in other.nodes()]:
+        if tuple(dict(n.attr) for n in sorted(self.nodes_iter())) != tuple(dict(n.attr) for n in sorted(other.nodes_iter())):
             return False
-        if [e.attr for e in self.edges()] != [e.attr for e in other.edges()]:
+        if tuple(dict(e.attr) for e in sorted(self.edges_iter())) != tuple(dict(e.attr) for e in sorted(other.edges_iter())):
             return False
-        if self.graph_attr != other.graph_attr:
+        if {n: nv for n, nv in self.node_attr.items() if nv != ''} != \
+           {n: nv for n, nv in other.node_attr.items() if nv != ''}:
+            return False
+        if {e:ev for e, ev in self.edge_attr.items() if ev != ''} != \
+           {e:ev for e, ev in other.edge_attr.items() if ev != ''}:
+            return False
+        if {g:gv for g, gv in self.graph_attr.items() if gv != ''} != \
+           {g:gv for g, gv in other.graph_attr.items() if gv != ''}:
             return False
         return True
 
     def __hash__(self):
-        # hash the string representation for id
-        return hash(self.string())
+        return hash((tuple(sorted(self.nodes_iter())),
+                     tuple(sorted(self.edges_iter())),
+                     ))
+                     # could include more but hash should be fast
+                     #tuple((dict(n.attr) for n in sorted(self.nodes_iter()))),
+                     #tuple((dict(e.attr) for e in sorted(self.edges_iter()))),
 
     def __iter__(self):
         # provide "for n in G"
