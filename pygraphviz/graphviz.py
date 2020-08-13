@@ -255,6 +255,18 @@ def gvRenderFilename(gvc, g, format, filename):
 
 def gvRenderData(gvc, g, format):
     return _graphviz.gvRenderData(gvc, g, format)
+
+def gvParseArgs(gvc, argc):
+    return _graphviz.gvParseArgs(gvc, argc)
+
+def gvRenderJobs(gvc, g):
+    return _graphviz.gvRenderJobs(gvc, g)
+
+def gvLayoutJobs(gvc, g):
+    return _graphviz.gvLayoutJobs(gvc, g)
+
+def gvNextInputGraph(gvc):
+    return _graphviz.gvNextInputGraph(gvc)
 AGRAPH = _graphviz.AGRAPH
 AGNODE = _graphviz.AGNODE
 AGOUTEDGE = _graphviz.AGOUTEDGE

@@ -305,11 +305,43 @@ int gvLayout(GVC_t *gvc, Agraph_t *g, char* prog);
 int gvFreeLayout(GVC_t *gvc, Agraph_t *g);
 int gvRender(GVC_t *gvc, Agraph_t* g, char *format, FILE *out=NULL);
 int gvRenderFilename(GVC_t *gvc, Agraph_t* g, char *format, char *filename);
-/* Writing a dit file to a string involves some pointer crazy stuff */
+/* Writing a dot file to a string involves some pointer crazy stuff */
 %include <cstring.i>
 %include <typemaps.i>
 %cstring_output_allocate(char **result, free(*$1)); 
 int gvRenderData(GVC_t *gvc, Agraph_t* g, char *format, char **result, unsigned int *OUTPUT);
+/* From Swig doc4.0 section 13.9 Multi-argument typemaps */
+%typemap(in) (int argc, char *argv[]) {
+  int i;
+  if (!PyList_Check($input)) {
+    PyErr_SetString(PyExc_ValueError, "Expecting a list");
+    SWIG_fail;
+  }
+  $1 = PyList_Size($input);
+  $2 = (char **) malloc(($1+1)*sizeof(char *));
+  for (i = 0; i < $1; i++) {
+    PyObject *s = PyList_GetItem($input, i);
+    if (!PyString_Check(s)) {
+      free($2);
+      PyErr_SetString(PyExc_ValueError, "List items must be strings");
+      SWIG_fail;
+    }
+    $2[i] = PyString_AsString(s);
+  }
+  $2[i] = 0;
+}
+
+%typemap(freearg) (int argc, char *argv[]) {
+  if ($2) free($2);
+}
+void gvParseArgs(GVC_t* gvc, int argc, char* argv[]=0);
+
+/* Render layout according to -T and -o options found by gvParseArgs */
+extern int gvRenderJobs(GVC_t *gvc, graph_t *g);
+/* Compute a layout using layout engine from command line args */
+extern int gvLayoutJobs(GVC_t *gvc, graph_t *g);
+extern Agraph_t *gvNextInputGraph(GVC_t *gvc);
+
 
 
 /* Agdesc_t Agdirected, Agstrictdirected, Agundirected, Agstrictundirected;  */

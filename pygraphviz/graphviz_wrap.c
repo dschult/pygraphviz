@@ -2674,10 +2674,11 @@ SWIGINTERN PyObject *SWIG_PyStaticMethod_New(PyObject *SWIGUNUSEDPARM(self), PyO
 #define SWIGTYPE_p_FILE swig_types[6]
 #define SWIGTYPE_p_GVC_t swig_types[7]
 #define SWIGTYPE_p_char swig_types[8]
-#define SWIGTYPE_p_p_char swig_types[9]
-#define SWIGTYPE_p_unsigned_int swig_types[10]
-static swig_type_info *swig_types[12];
-static swig_module_info swig_module = {swig_types, 11, 0, 0, 0, 0};
+#define SWIGTYPE_p_graph_t swig_types[9]
+#define SWIGTYPE_p_p_char swig_types[10]
+#define SWIGTYPE_p_unsigned_int swig_types[11]
+static swig_type_info *swig_types[13];
+static swig_module_info swig_module = {swig_types, 12, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -5107,6 +5108,137 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_gvParseArgs(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  GVC_t *arg1 = (GVC_t *) 0 ;
+  int arg2 ;
+  char **arg3 = (char **) (char **)0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "gvParseArgs", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GVC_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gvParseArgs" "', argument " "1"" of type '" "GVC_t *""'"); 
+  }
+  arg1 = (GVC_t *)(argp1);
+  {
+    int i;
+    if (!PyList_Check(swig_obj[1])) {
+      PyErr_SetString(PyExc_ValueError, "Expecting a list");
+      SWIG_fail;
+    }
+    arg2 = PyList_Size(swig_obj[1]);
+    arg3 = (char **) malloc((arg2+1)*sizeof(char *));
+    for (i = 0; i < arg2; i++) {
+      PyObject *s = PyList_GetItem(swig_obj[1], i);
+      if (!PyString_Check(s)) {
+        free(arg3);
+        PyErr_SetString(PyExc_ValueError, "List items must be strings");
+        SWIG_fail;
+      }
+      arg3[i] = PyString_AsString(s);
+    }
+    arg3[i] = 0;
+  }
+  gvParseArgs(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  {
+    if (arg3) free(arg3);
+  }
+  return resultobj;
+fail:
+  {
+    if (arg3) free(arg3);
+  }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_gvRenderJobs(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  GVC_t *arg1 = (GVC_t *) 0 ;
+  graph_t *arg2 = (graph_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  int result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "gvRenderJobs", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GVC_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gvRenderJobs" "', argument " "1"" of type '" "GVC_t *""'"); 
+  }
+  arg1 = (GVC_t *)(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_graph_t, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gvRenderJobs" "', argument " "2"" of type '" "graph_t *""'"); 
+  }
+  arg2 = (graph_t *)(argp2);
+  result = (int)gvRenderJobs(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_gvLayoutJobs(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  GVC_t *arg1 = (GVC_t *) 0 ;
+  graph_t *arg2 = (graph_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  int result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "gvLayoutJobs", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GVC_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gvLayoutJobs" "', argument " "1"" of type '" "GVC_t *""'"); 
+  }
+  arg1 = (GVC_t *)(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_graph_t, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gvLayoutJobs" "', argument " "2"" of type '" "graph_t *""'"); 
+  }
+  arg2 = (graph_t *)(argp2);
+  result = (int)gvLayoutJobs(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_gvNextInputGraph(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  GVC_t *arg1 = (GVC_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  Agraph_t *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GVC_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gvNextInputGraph" "', argument " "1"" of type '" "GVC_t *""'"); 
+  }
+  arg1 = (GVC_t *)(argp1);
+  result = (Agraph_t *)gvNextInputGraph(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_Agraph_t, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN int Swig_var_Agdirected_set(PyObject *_val SWIGUNUSED) {
   SWIG_Error(SWIG_AttributeError,"Variable Agdirected is read-only.");
   return 1;
@@ -5222,6 +5354,10 @@ static PyMethodDef SwigMethods[] = {
 	 { "gvRender", _wrap_gvRender, METH_VARARGS, NULL},
 	 { "gvRenderFilename", _wrap_gvRenderFilename, METH_VARARGS, NULL},
 	 { "gvRenderData", _wrap_gvRenderData, METH_VARARGS, NULL},
+	 { "gvParseArgs", _wrap_gvParseArgs, METH_VARARGS, NULL},
+	 { "gvRenderJobs", _wrap_gvRenderJobs, METH_VARARGS, NULL},
+	 { "gvLayoutJobs", _wrap_gvLayoutJobs, METH_VARARGS, NULL},
+	 { "gvNextInputGraph", _wrap_gvNextInputGraph, METH_O, NULL},
 	 { NULL, NULL, 0, NULL }
 };
 
@@ -5241,6 +5377,7 @@ static swig_type_info _swigt__p_Agsym_t = {"_p_Agsym_t", "Agsym_t *", 0, 0, (voi
 static swig_type_info _swigt__p_FILE = {"_p_FILE", "FILE *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_GVC_t = {"_p_GVC_t", "GVC_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_graph_t = {"_p_graph_t", "graph_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_char = {"_p_p_char", "char **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "unsigned int *", 0, 0, (void*)0, 0};
 
@@ -5254,6 +5391,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_FILE,
   &_swigt__p_GVC_t,
   &_swigt__p_char,
+  &_swigt__p_graph_t,
   &_swigt__p_p_char,
   &_swigt__p_unsigned_int,
 };
@@ -5267,6 +5405,7 @@ static swig_cast_info _swigc__p_Agsym_t[] = {  {&_swigt__p_Agsym_t, 0, 0, 0},{0,
 static swig_cast_info _swigc__p_FILE[] = {  {&_swigt__p_FILE, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_GVC_t[] = {  {&_swigt__p_GVC_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_graph_t[] = {  {&_swigt__p_graph_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_char[] = {  {&_swigt__p_p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_int[] = {  {&_swigt__p_unsigned_int, 0, 0, 0},{0, 0, 0, 0}};
 
@@ -5280,6 +5419,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_FILE,
   _swigc__p_GVC_t,
   _swigc__p_char,
+  _swigc__p_graph_t,
   _swigc__p_p_char,
   _swigc__p_unsigned_int,
 };

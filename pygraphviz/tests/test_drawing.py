@@ -1,13 +1,8 @@
 from tempfile import TemporaryFile
 import pytest
 import pygraphviz as pgv
+stringify = pgv.testing.stringify
 
-
-def stringify(agraph):
-    result = agraph.string().split()
-    if '""' in result:
-        result.remove('""')
-    return " ".join(result)
 
 def test_drawing_error_no_layout():
     with pytest.raises(AttributeError):
@@ -15,11 +10,24 @@ def test_drawing_error_no_layout():
         A.add_path([1, 2, 3, 4])
         d = A.draw(prog="nop")
 
+
 def test_drawing_error_old():
     with pytest.raises(AttributeError):
         A = pgv.AGraph(name="test graph")
         A.add_path([1, 2, 3, 4])
         d = A.draw_command_line()
+
+
+def test_name_error():
+    with pytest.raises(ValueError):
+        A = pgv.AGraph(name="test graph")
+        A.draw("foo", prog="foo")
+
+
+def test_name_error_old():
+    with pytest.raises(ValueError):
+        A = pgv.AGraph(name="test graph")
+        A.draw_command_line("foo", prog="foo")
 
 
 # this is not a very good way to test...
@@ -54,6 +62,37 @@ def test_drawing_makes_file():
     with TemporaryFile() as fh:
         A.draw(path=fh, prog="circo", format="png")
         assert fh.tell() > 0
+
+def test_name1():
+    A = pgv.AGraph(name="")
+    assert stringify(A) == "strict graph { }"
+    assert A.__repr__()[0:7] == "<AGraph"
+
+def test_drawing_args():
+    A = pgv.AGraph(name='test graph')
+    A.add_path([1, 2, 3, 4])
+#    A.draw(path="wrap.png", prog="twopi")
+#    A.draw(path="wrapblank.png", prog="twopi",args="-Nshape=circle")
+    args = "-Ncolor=red -Nshape=box -Efontsize=8 -Grotate=90"
+#    A.draw(path="wrapargs.pdf", prog="twopi", args=args)
+    with TemporaryFile() as fh:
+        A.draw(fh, format="dot", prog="twopi", args=args)
+        fh.seek(0)
+        dot_string = fh.read().decode(A.encoding)
+    with TemporaryFile() as fh:
+        A.draw(fh, format="dot", prog="twopi", args=" ")
+        fh.seek(0)
+        dot_string = fh.read().decode(A.encoding)
+    print(dot_string)
+    print(A.string())
+    #assert "red" in dot_string
+    #assert "fontsize" in dot_string
+    #assert "rotate" in dot_string
+
+def test_name2():
+    A = pgv.AGraph(name="")
+    assert stringify(A) == "strict graph { }"
+    assert A.__repr__()[0:7] == "<AGraph"
 
 
 def test_drawing_to_create_dot_string():
@@ -95,13 +134,3 @@ def test_drawing_to_create_dot_string():
 """
     #print("dot representation:", dot_rep)
     #assert expected == dot_rep
-
-def test_name_error():
-    with pytest.raises(ValueError):
-        A = pgv.AGraph(name="test graph")
-        A.draw("foo", prog="foo")
-
-def test_name_error_old():
-    with pytest.raises(ValueError):
-        A = pgv.AGraph(name="test graph")
-        A.draw_command_line("foo", prog="foo")

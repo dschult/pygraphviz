@@ -93,9 +93,9 @@ class TestGraph(unittest.TestCase):
         assert A == B
 
         A.node_attr['low'] = 3
-        assert A != B
-        B.node_attr['low'] = 3
         assert A == B
+        pgv.Node(A, 3).attr["low"] = 4
+        pgv.Node(B, 3).attr["low"] = 4
         # print(sorted(A.nodes()), sorted(B.nodes()))
         # print(sorted(A.edges()), sorted(B.edges()))
         # print(tuple(dict(n.attr) for n in sorted(A.nodes())))
@@ -107,11 +107,9 @@ class TestGraph(unittest.TestCase):
         # print(dict(A.graph_attr), dict(B.graph_attr))
         assert A == B
         A.edge_attr['low'] = 4
-        assert A != B
-        B.edge_attr['low'] = 4
         assert A == B
         A.graph_attr.update({'low': 5})
-        assert A != B
+        assert A == B
 
     def test_hash(self):
         A = pgv.AGraph()

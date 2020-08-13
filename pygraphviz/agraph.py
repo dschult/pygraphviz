@@ -244,24 +244,28 @@ class AGraph:
 
     def __eq__(self, other):
         # two graphs are equal if they have exact same nodes and edges
-        # and attributes.  This is not graph isomorphism
+        # and attributes.  This is not graph isomorphism.
         if sorted(self.nodes()) != sorted(other.nodes()):
             return False
         if sorted(self.edges()) != sorted(other.edges()):
             return False
+        # check attributes
         if tuple(dict(n.attr) for n in sorted(self.nodes_iter())) != tuple(dict(n.attr) for n in sorted(other.nodes_iter())):
             return False
         if tuple(dict(e.attr) for e in sorted(self.edges_iter())) != tuple(dict(e.attr) for e in sorted(other.edges_iter())):
             return False
-        if {n: nv for n, nv in self.node_attr.items() if nv != ''} != \
-           {n: nv for n, nv in other.node_attr.items() if nv != ''}:
-            return False
-        if {e:ev for e, ev in self.edge_attr.items() if ev != ''} != \
-           {e:ev for e, ev in other.edge_attr.items() if ev != ''}:
-            return False
-        if {g:gv for g, gv in self.graph_attr.items() if gv != ''} != \
-           {g:gv for g, gv in other.graph_attr.items() if gv != ''}:
-            return False
+        # We could check the default attributes too.
+        # But they aren't reflected in the attibutes until node is added.
+        # check default attributes
+        ##if {n: nv for n, nv in self.node_attr.items() if nv != ''} != \
+        ##   {n: nv for n, nv in other.node_attr.items() if nv != ''}:
+        ##    return False
+        ##if {e:ev for e, ev in self.edge_attr.items() if ev != ''} != \
+        ##   {e:ev for e, ev in other.edge_attr.items() if ev != ''}:
+        ##    return False
+        ##if {g:gv for g, gv in self.graph_attr.items() if gv != ''} != \
+        ##   {g:gv for g, gv in other.graph_attr.items() if gv != ''}:
+        ##    return False
         return True
 
     def __hash__(self):
@@ -1420,6 +1424,7 @@ class AGraph:
         >>> A=AGraph()
         >>> A.layout() # uses neato
         >>> A.layout(prog='dot')
+        >>> A.layout(prog='dot', args="-Nshape=box -Efontsize=8")
 
         Use keyword `args` to add additional arguments to graphviz programs.
 
@@ -1432,7 +1437,10 @@ class AGraph:
         AGraph when rendering.
         """
         gvc = gv.gvContext()
-        # TODO allow `args` to be added to the context
+        # add `args` to the context
+        #arg_list = shlex.split(args)
+        #print(arg_list)
+        #gv.gvParseArgs(gvc, arg_list)
 
         if isinstance(prog, str):
             prog = prog.encode(self.encoding)
@@ -1500,15 +1508,21 @@ class AGraph:
         gv.gvFreeLayout(gvc, self.handle)
         gv.gvFreeContext(gvc)
 
-    def simple_dot_writer(self):
+    def draw_with_args(self, args=""):
+        """args can create a sequence of layout and render jobs"""
         gvc = gv.gvContext()
-        ans = gv.gvRenderData(gvc, self.handle, b"dot")
+
+        arg_list = shlex.split(args)
+        arg_list = ["dot"] + arg_list
+        print(arg_list)
+        bytes_arg_list = [arg.encode(self.encoding) for arg in arg_list]
+        gv.gvParseArgs(gvc, bytes_arg_list)
+
+        gv.gvLayoutJobs(gvc, self.handle)
+        gv.gvRenderJobs(gvc, self.handle)
+        gv.gvFreeLayout(gvc, self.handle)
         gv.gvFreeContext(gvc)
-        if ans[0]:  # Error... probably no layout in agraph
-            return self.to_string()
-        err, dot_string, length = ans
-        assert len(dot_string) == length
-        return dot_string.decode(self.encoding)
+
 
     def draw(self, path=None, format="jpg", prog="neato", args=""):
         """Output graph to path using gvRender function
@@ -1577,7 +1591,16 @@ class AGraph:
             prog = prog.encode(self.encoding)
 
         gvc = gv.gvContext()
-        # TODO allow `args` to be added to the context
+        # add `args` to the context
+        if args:
+            arg_list = shlex.split(args)
+            # convert from strings to bytes
+            arg_list = [arg.encode(self.encoding) for arg in arg_list]
+            # first argument should be layout program: dot, neato, circo, etc...
+            arg_list = [prog] + arg_list
+            print("Parse Args: ", arg_list)
+            gv.gvParseArgs(gvc, arg_list)
+
         G = self.handle
 
         # Layout
@@ -1589,12 +1612,13 @@ class AGraph:
             raise ValueError(f"Can't find prog={prog} in this graphviz installation")
 
         # Render
-        fh = self._get_fh(path, mode="w+b")
+        fh = self._get_fh(path, mode="wb")
         err = gv.gvRender(gvc, G, format, fh)
         if err:
             raise ValueError("Graphviz raised a render error. Maybe bad format?")
         if is_string_like(path):
             fh.close()
+        gv.gvFreeLayout(gvc, G)
         gv.gvFreeContext(gvc)
 
 
@@ -1931,6 +1955,9 @@ class Attribute(MutableMapping):
 
     def __len__(self):
         return len(list(self.__iter__()))
+
+    def __repr__(self):
+        return str(dict(self.iteritems()))
 
     def has_key(self, name):
         return self.__contains__(name)
