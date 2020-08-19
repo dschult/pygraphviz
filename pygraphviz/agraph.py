@@ -1276,13 +1276,16 @@ class AGraph:
         The regular `string()` uses agwrite to produce "dot" without rendering.
         """
         gvc = gv.gvContext()
-        gv.gvLayout(gvc, self.handle, b"nop")
-        ans = gv.gvRenderData(gvc, self.handle, b"dot")
+        G = self.handle
+        gv.gvLayout(gvc, G, b"nop")
+        ans = gv.gvRenderData(gvc, G, b"dot")
         if ans[0]:
             raise ValueError(f"Graphviz Error creating dot representation: {ans[0]}")
         err, dot_string, length = ans
         assert len(dot_string) == length
+        gv.gvFreeLayout(gvc, G)
         gv.gvFreeContext(gvc)
+
         return dot_string.decode(self.encoding)
 
     def to_string(self):
@@ -1436,19 +1439,13 @@ class AGraph:
         If you use prog="nop2" it will take node and edge positions from the
         AGraph when rendering.
         """
+        _ , prog = self.my_parse_args(args, None, prog)
+
         gvc = gv.gvContext()
-        # add `args` to the context
-        #arg_list = shlex.split(args)
-        #print(arg_list)
-        #gv.gvParseArgs(gvc, arg_list)
-
-        if isinstance(prog, str):
-            prog = prog.encode(self.encoding)
-
         gv.gvLayout(gvc, self.handle, prog)
         gv.gvRender(gvc, self.handle, format=b"dot", out=None)
-        gv.gvFreeLayout(gvc, self.handle)
 
+        gv.gvFreeLayout(gvc, self.handle)
         gv.gvFreeContext(gvc)
 
         self.has_layout = True
@@ -1495,33 +1492,126 @@ class AGraph:
             format = format.encode(self.encoding)
 
         gvc = gv.gvContext()
-        err = gv.gvLayout(gvc, self.handle, prog)
+        print("GVC ID: ", id(gvc))
+        AG = self.copy()
+        G = AG.handle
+
+        err = gv.gvLayout(gvc, G, prog)
         if err:
             if err != -1:
                 raise ValueError("Graphviz raised a layout error.")
             prog = prog.decode(self.encoding)
             raise ValueError(f"Can't find prog={prog} in this graphviz installation")
         with self._get_fh(path, mode="w+b") as fh:
-            err = gv.gvRender(gvc, self.handle, format, fh)
+            err = gv.gvRender(gvc, G, format, fh)
             if err:
                 raise ValueError("Graphviz raised a render error. Maybe bad format?")
-        gv.gvFreeLayout(gvc, self.handle)
+        gv.gvFreeLayout(gvc, G)
+        gv.gvFinalize(gvc)
         gv.gvFreeContext(gvc)
 
-    def draw_with_args(self, args=""):
-        """args can create a sequence of layout and render jobs"""
+    def my_parse_args(self, args, format=None, prog=None):
+        arg_list = shlex.split(args)
+        for arg in arg_list:
+            value = arg[2:]
+            if arg[:2] == "-T":
+                if format and format != value:
+                    raise ValueError("format specified differently in args and format inputs")
+                format = value
+            if arg[:2] == "-K":
+                if prog and prog != value:
+                    raise ValueError("prog specified differently in args and prog inputs")
+                prog = value
+            if arg[:2] == "-G":
+                key, val = value.split("=")
+                self.graph_attr[key] = val
+            if arg[:2] == "-N":
+                key, val = value.split("=")
+                self.node_attr[key] = val
+            if arg[:2] == "-E":
+                key, val = value.split("=")
+                self.edge_attr[key] = val
+
+        # convert input strings to type bytes (encode it)
+        if isinstance(format, str):
+            format = format.encode(self.encoding)
+        if isinstance(prog, str):
+            prog = prog.encode(self.encoding)
+        return format, prog
+
+    def draw_with_args(self, path="ttt.dot", format="dot", prog="neato", args=""):
+        format, prog = self.my_parse_args(args, format, prog)
+
+        # Create a Context to render in
         gvc = gv.gvContext()
+        G = self.handle
+        # Layout
+        err = gv.gvLayout(gvc, G, prog)
+        if err:
+            if err != -1:
+                raise ValueError("Graphviz raised a layout error.")
+            prog = prog.decode(self.encoding)
+            raise ValueError(f"Can't find prog={prog} in this graphviz installation")
+
+        # Render
+        if path is None:
+            path = sys.stdout
+        fh = self._get_fh(path, mode="wb")
+        err = gv.gvRender(gvc, G, format, fh)
+        if err:
+            raise ValueError("Graphviz raised a render error. Maybe bad format?")
+        if is_string_like(path):
+            fh.close()
+        gv.gvFreeLayout(gvc, G)
+        gv.gvFreeContext(gvc)
+
+    def old_draw_with_args(self, args=""):
+        """args can create a sequence of layout and render jobs"""
+
+        gvc = gv.gvContext()
+        print("GVC ID: ", id(gvc))
+        print("self.graph_attr=",self.graph_attr)
 
         arg_list = shlex.split(args)
         arg_list = ["dot"] + arg_list
         print(arg_list)
         bytes_arg_list = [arg.encode(self.encoding) for arg in arg_list]
-        gv.gvParseArgs(gvc, bytes_arg_list)
 
-        gv.gvLayoutJobs(gvc, self.handle)
-        gv.gvRenderJobs(gvc, self.handle)
-        gv.gvFreeLayout(gvc, self.handle)
+
+        gv.gvParseArgs(gvc, bytes_arg_list)
+#        err = gv.gvFreeContext(gvc)
+#        if err != 1:   # Not sure this is working
+#            raise TypeError(f"ERROR: gvFreeContext had {err} errors")
+#        else:
+#            print("BOK")
+#        gvc = gv.gvContext()
+#        gv.gvParseArgs(gvc, [b" "])
+#
+        print("\n\n\n",Attribute(self.handle, 0))
+        print("PARSED THE ARGS")
+        print(Attribute(self.handle, 0))
+
+        AG = self.copy()
+        G = AG.handle
+#        print("\n\n\n",Attribute(AG.handle, 0))
+#        print("self.graph_attr=",self.graph_attr, id(self.graph_attr), id(self.graph_attr.handle))
+#        print("AG.graph_attr=",AG.graph_attr, id(AG.graph_attr), id(AG.graph_attr.handle))
+
+        gv.gvLayoutJobs(gvc, G)
+        gv.gvRenderJobs(gvc, G)
+        gv.gvFreeLayout(gvc, G)
+        gv.gvFinalize(gvc)
         gv.gvFreeContext(gvc)
+#        del gvc
+#        print("self.graph_attr=",self.graph_attr, id(self.graph_attr), id(self.graph_attr.handle))
+#        print("AG.graph_attr=",AG.graph_attr, id(AG.graph_attr), id(AG.graph_attr.handle))
+        assert G is AG.handle
+#        print("G=", id(G), "AG.handle=",id(AG.handle))
+#        del AG
+#        del G
+
+#        print("AG.graph_attr:",AG.graph_attr)
+#        print(arg_list)
 
 
     def draw(self, path=None, format="jpg", prog="neato", args=""):
@@ -1591,6 +1681,10 @@ class AGraph:
             prog = prog.encode(self.encoding)
 
         gvc = gv.gvContext()
+        print("GVC ID: ", id(gvc))
+        AG = self.copy()
+        G = AG.handle
+
         # add `args` to the context
         if args:
             arg_list = shlex.split(args)
@@ -1600,25 +1694,27 @@ class AGraph:
             arg_list = [prog] + arg_list
             print("Parse Args: ", arg_list)
             gv.gvParseArgs(gvc, arg_list)
+            gv.gvLayoutJobs(gvc, G)
+            gv.gvRenderJobs(gvc, G)
+        else:
+            # Layout
+            err = gv.gvLayout(gvc, G, prog)
+            if err:
+                if err != -1:
+                    raise ValueError("Graphviz raised a layout error.")
+                prog = prog.decode(self.encoding)
+                raise ValueError(f"Can't find prog={prog} in this graphviz installation")
 
-        G = self.handle
-
-        # Layout
-        err = gv.gvLayout(gvc, G, prog)
-        if err:
-            if err != -1:
-                raise ValueError("Graphviz raised a layout error.")
-            prog = prog.decode(self.encoding)
-            raise ValueError(f"Can't find prog={prog} in this graphviz installation")
-
-        # Render
-        fh = self._get_fh(path, mode="wb")
-        err = gv.gvRender(gvc, G, format, fh)
-        if err:
-            raise ValueError("Graphviz raised a render error. Maybe bad format?")
-        if is_string_like(path):
-            fh.close()
+            # Render
+            fh = self._get_fh(path, mode="wb")
+            err = gv.gvRender(gvc, G, format, fh)
+            if err:
+                raise ValueError("Graphviz raised a render error. Maybe bad format?")
+            if is_string_like(path):
+                fh.close()
         gv.gvFreeLayout(gvc, G)
+        AG.close()
+        gv.gvFinalize(gvc)
         gv.gvFreeContext(gvc)
 
 
@@ -1746,8 +1842,8 @@ class AGraph:
     def _update_handle_references(self):
         try:
             self.graph_attr.handle = self.handle
-            self.node_attr.handle = self.handle
-            self.edge_attr.handle = self.handle
+            self.node_attr.ghandle = self.handle
+            self.edge_attr.ghandle = self.handle
         except AttributeError:
             pass  # ignore as likely still in __init__()
 

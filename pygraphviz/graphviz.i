@@ -294,22 +294,54 @@ def agnameof(handle):
 %}
 
 
+
+
+/* Agdesc_t Agdirected, Agstrictdirected, Agundirected, Agstrictundirected;  */
+/* constants are safer */
+/* directed, strict, noloops, maingraph */
+const Agdesc_t Agdirected = { 1, 0, 0, 1 };
+const Agdesc_t Agstrictdirected = { 1, 1, 0, 1 };
+const Agdesc_t Agundirected = { 0, 0, 0, 1 };
+const Agdesc_t Agstrictundirected = { 0, 1, 0, 1 };
+
+
+#define AGRAPH      0               /* can't exceed 2 bits. see Agtag_t. */
+#define AGNODE      1
+#define AGOUTEDGE   2
+#define AGINEDGE    3               /* (1 << 1) indicates an edge tag.   */
+#define AGEDGE      AGOUTEDGE       /* synonym in object kind args */
+
+
+
+/********************** GVC ****************/
+
 /* gvLayout and gvRender for layout and rendering of graphs */
 /*   gvc --> GraphViz context, g --> graph           */
 /*   format --> "dot", "ps", "png", "cmap", ...           */
 /*   out --> NULL, homebaked_layout_position_storage, ...           */
 /*   prog --> "dot", "nop", "nop2",            */
 GVC_t *gvContext(void);
+GVC_t *gvNEWcontext(const lt_symlist_t *builtins, int demand_loading);
+void gvFinalize(GVC_t *gvc);
 int gvFreeContext(GVC_t *gvc);
 int gvLayout(GVC_t *gvc, Agraph_t *g, char* prog);
 int gvFreeLayout(GVC_t *gvc, Agraph_t *g);
 int gvRender(GVC_t *gvc, Agraph_t* g, char *format, FILE *out=NULL);
 int gvRenderFilename(GVC_t *gvc, Agraph_t* g, char *format, char *filename);
+/* Render layout according to -T and -o options found by gvParseArgs */
+extern int gvRenderJobs(GVC_t *gvc, Agraph_t *g);
+/* Compute a layout using layout engine from command line args */
+extern int gvLayoutJobs(GVC_t *gvc, Agraph_t *g);
+extern Agraph_t *gvNextInputGraph(GVC_t *gvc);
+
 /* Writing a dot file to a string involves some pointer crazy stuff */
 %include <cstring.i>
 %include <typemaps.i>
 %cstring_output_allocate(char **result, free(*$1)); 
 int gvRenderData(GVC_t *gvc, Agraph_t* g, char *format, char **result, unsigned int *OUTPUT);
+
+
+/* parseArgs requires writable input parameters */
 /* From Swig doc4.0 section 13.9 Multi-argument typemaps */
 %typemap(in) (int argc, char *argv[]) {
   int i;
@@ -335,29 +367,4 @@ int gvRenderData(GVC_t *gvc, Agraph_t* g, char *format, char **result, unsigned 
   if ($2) free($2);
 }
 void gvParseArgs(GVC_t* gvc, int argc, char* argv[]=0);
-
-/* Render layout according to -T and -o options found by gvParseArgs */
-extern int gvRenderJobs(GVC_t *gvc, graph_t *g);
-/* Compute a layout using layout engine from command line args */
-extern int gvLayoutJobs(GVC_t *gvc, graph_t *g);
-extern Agraph_t *gvNextInputGraph(GVC_t *gvc);
-
-
-
-/* Agdesc_t Agdirected, Agstrictdirected, Agundirected, Agstrictundirected;  */
-/* constants are safer */
-/* directed, strict, noloops, maingraph */
-const Agdesc_t Agdirected = { 1, 0, 0, 1 };
-const Agdesc_t Agstrictdirected = { 1, 1, 0, 1 };
-const Agdesc_t Agundirected = { 0, 0, 0, 1 };
-const Agdesc_t Agstrictundirected = { 0, 1, 0, 1 };
-
-
-#define AGRAPH      0               /* can't exceed 2 bits. see Agtag_t. */
-#define AGNODE      1
-#define AGOUTEDGE   2
-#define AGINEDGE    3               /* (1 << 1) indicates an edge tag.   */
-#define AGEDGE      AGOUTEDGE       /* synonym in object kind args */
-
-
 

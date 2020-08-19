@@ -49,10 +49,6 @@ def test_name_error_old():
 def test_drawing_makes_file():
     A = pgv.AGraph(name='test graph')
     A.add_path([1, 2, 3, 4])
-#    print(A.to_string())
-#    A.layout()
-#    print(A.has_layout)
-#    print(A.to_string())
     with TemporaryFile() as fh:
         A.draw(fh, format="jpg")
         assert fh.tell() > 0
@@ -65,12 +61,16 @@ def test_drawing_makes_file():
 
 def test_name1():
     A = pgv.AGraph(name="")
-    assert stringify(A) == "strict graph { }"
+    print(stringify(A))
     assert A.__repr__()[0:7] == "<AGraph"
+    assert stringify(A) == "strict graph { }"
+    print("A.graph_attr=",A.graph_attr, id(A.graph_attr.handle))
 
 def test_drawing_args():
     A = pgv.AGraph(name='test graph')
     A.add_path([1, 2, 3, 4])
+    return
+
 #    A.draw(path="wrap.png", prog="twopi")
 #    A.draw(path="wrapblank.png", prog="twopi",args="-Nshape=circle")
     args = "-Ncolor=red -Nshape=box -Efontsize=8 -Grotate=90"
@@ -79,20 +79,57 @@ def test_drawing_args():
         A.draw(fh, format="dot", prog="twopi", args=args)
         fh.seek(0)
         dot_string = fh.read().decode(A.encoding)
+#    print(dot_string)
+    assert "red" in dot_string
+    assert "fontsize" in dot_string
+    assert "rotate" in dot_string
+#    print(A.string())
     with TemporaryFile() as fh:
         A.draw(fh, format="dot", prog="twopi", args=" ")
         fh.seek(0)
         dot_string = fh.read().decode(A.encoding)
-    print(dot_string)
-    print(A.string())
-    #assert "red" in dot_string
-    #assert "fontsize" in dot_string
-    #assert "rotate" in dot_string
+#    print(dot_string)
+#    print(A.string())
+    assert "red" not in dot_string
+    assert "fontsize" not in dot_string
+    assert "rotate" not in dot_string
 
 def test_name2():
     A = pgv.AGraph(name="")
-    assert stringify(A) == "strict graph { }"
     assert A.__repr__()[0:7] == "<AGraph"
+#    assert stringify(A) == """strict graph { graph [rotate=90]; node [color=red, label="\\N", shape=box ]; edge [fontsize=8]; }"""
+    assert stringify(A) == "strict graph { }"
+    print("A.graph_attr=",A.graph_attr, id(A.graph_attr.handle))
+
+def test_draw_with_args():
+    A = pgv.AGraph(name='test graph')
+    A.add_path([1, 2, 3, 4])
+#    print("A.graph_attr=",A.graph_attr, id(A.graph_attr.handle))
+    args = "-Ncolor=red -opath.dot -Nshape=box -Efontsize=8 -Grotate=90"
+#    print("Before test_draw_with_args: A.string()=",A.string())
+#    print("Before test_draw_with_args: A.string_nop()=",A.string_nop())
+#    print("Before test_draw_with_args: A.string()=",A.string())
+    A.draw_with_args(args)
+#    print("A.graph_attr=",A.graph_attr, id(A.graph_attr.handle))
+    dot_string = A.string()
+    nop_string = A.string_nop()
+#    print("A.graph_attr=",A.graph_attr, id(A.graph_attr.handle))
+#    print("After test_draw_with_args: A.string()",dot_string)
+#    print("After test_draw_with_args: A.string_nop()",nop_string)
+#    print("After test_draw_with_args: A.string()",A.string())
+    assert "red" not in dot_string
+    assert "red" not in nop_string
+#    assert False
+
+def test_name3():
+    A = pgv.AGraph(name="")
+    print(A.__repr__())
+    print(stringify(A))
+    assert A.__repr__()[0:7] == "<AGraph"
+#    assert stringify(A) == """strict graph { graph [rotate=90]; node [color=red, label="\\N", shape=box ]; edge [fontsize=8]; }"""
+    assert stringify(A) == "strict graph { }"
+#    print("A.graph_attr=",A.graph_attr, id(A.graph_attr.handle))
+#    assert False
 
 
 def test_drawing_to_create_dot_string():

@@ -2674,11 +2674,10 @@ SWIGINTERN PyObject *SWIG_PyStaticMethod_New(PyObject *SWIGUNUSEDPARM(self), PyO
 #define SWIGTYPE_p_FILE swig_types[6]
 #define SWIGTYPE_p_GVC_t swig_types[7]
 #define SWIGTYPE_p_char swig_types[8]
-#define SWIGTYPE_p_graph_t swig_types[9]
-#define SWIGTYPE_p_p_char swig_types[10]
-#define SWIGTYPE_p_unsigned_int swig_types[11]
-static swig_type_info *swig_types[13];
-static swig_module_info swig_module = {swig_types, 12, 0, 0, 0, 0};
+#define SWIGTYPE_p_p_char swig_types[9]
+#define SWIGTYPE_p_unsigned_int swig_types[10]
+static swig_type_info *swig_types[12];
+static swig_module_info swig_module = {swig_types, 11, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -4835,6 +4834,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_gvFinalize(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  GVC_t *arg1 = (GVC_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_GVC_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gvFinalize" "', argument " "1"" of type '" "GVC_t *""'"); 
+  }
+  arg1 = (GVC_t *)(argp1);
+  gvFinalize(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_gvFreeContext(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   GVC_t *arg1 = (GVC_t *) 0 ;
@@ -5159,7 +5180,7 @@ fail:
 SWIGINTERN PyObject *_wrap_gvRenderJobs(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   GVC_t *arg1 = (GVC_t *) 0 ;
-  graph_t *arg2 = (graph_t *) 0 ;
+  Agraph_t *arg2 = (Agraph_t *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -5173,11 +5194,11 @@ SWIGINTERN PyObject *_wrap_gvRenderJobs(PyObject *SWIGUNUSEDPARM(self), PyObject
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gvRenderJobs" "', argument " "1"" of type '" "GVC_t *""'"); 
   }
   arg1 = (GVC_t *)(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_graph_t, 0 |  0 );
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_Agraph_t, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gvRenderJobs" "', argument " "2"" of type '" "graph_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gvRenderJobs" "', argument " "2"" of type '" "Agraph_t *""'"); 
   }
-  arg2 = (graph_t *)(argp2);
+  arg2 = (Agraph_t *)(argp2);
   result = (int)gvRenderJobs(arg1,arg2);
   resultobj = SWIG_From_int((int)(result));
   return resultobj;
@@ -5189,7 +5210,7 @@ fail:
 SWIGINTERN PyObject *_wrap_gvLayoutJobs(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   GVC_t *arg1 = (GVC_t *) 0 ;
-  graph_t *arg2 = (graph_t *) 0 ;
+  Agraph_t *arg2 = (Agraph_t *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -5203,11 +5224,11 @@ SWIGINTERN PyObject *_wrap_gvLayoutJobs(PyObject *SWIGUNUSEDPARM(self), PyObject
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gvLayoutJobs" "', argument " "1"" of type '" "GVC_t *""'"); 
   }
   arg1 = (GVC_t *)(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_graph_t, 0 |  0 );
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_Agraph_t, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gvLayoutJobs" "', argument " "2"" of type '" "graph_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gvLayoutJobs" "', argument " "2"" of type '" "Agraph_t *""'"); 
   }
-  arg2 = (graph_t *)(argp2);
+  arg2 = (Agraph_t *)(argp2);
   result = (int)gvLayoutJobs(arg1,arg2);
   resultobj = SWIG_From_int((int)(result));
   return resultobj;
@@ -5348,6 +5369,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "agdelnode", _wrap_agdelnode, METH_VARARGS, NULL},
 	 { "agdeledge", _wrap_agdeledge, METH_VARARGS, NULL},
 	 { "gvContext", _wrap_gvContext, METH_NOARGS, NULL},
+	 { "gvFinalize", _wrap_gvFinalize, METH_O, NULL},
 	 { "gvFreeContext", _wrap_gvFreeContext, METH_O, NULL},
 	 { "gvLayout", _wrap_gvLayout, METH_VARARGS, NULL},
 	 { "gvFreeLayout", _wrap_gvFreeLayout, METH_VARARGS, NULL},
@@ -5377,7 +5399,6 @@ static swig_type_info _swigt__p_Agsym_t = {"_p_Agsym_t", "Agsym_t *", 0, 0, (voi
 static swig_type_info _swigt__p_FILE = {"_p_FILE", "FILE *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_GVC_t = {"_p_GVC_t", "GVC_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_graph_t = {"_p_graph_t", "graph_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_char = {"_p_p_char", "char **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "unsigned int *", 0, 0, (void*)0, 0};
 
@@ -5391,7 +5412,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_FILE,
   &_swigt__p_GVC_t,
   &_swigt__p_char,
-  &_swigt__p_graph_t,
   &_swigt__p_p_char,
   &_swigt__p_unsigned_int,
 };
@@ -5405,7 +5425,6 @@ static swig_cast_info _swigc__p_Agsym_t[] = {  {&_swigt__p_Agsym_t, 0, 0, 0},{0,
 static swig_cast_info _swigc__p_FILE[] = {  {&_swigt__p_FILE, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_GVC_t[] = {  {&_swigt__p_GVC_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_graph_t[] = {  {&_swigt__p_graph_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_char[] = {  {&_swigt__p_p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_int[] = {  {&_swigt__p_unsigned_int, 0, 0, 0},{0, 0, 0, 0}};
 
@@ -5419,7 +5438,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_FILE,
   _swigc__p_GVC_t,
   _swigc__p_char,
-  _swigc__p_graph_t,
   _swigc__p_p_char,
   _swigc__p_unsigned_int,
 };

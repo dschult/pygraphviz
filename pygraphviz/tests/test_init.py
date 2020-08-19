@@ -7,10 +7,12 @@ def test_simple1():
 
 def test_drawing_simple():
     A = pgv.AGraph(name="")
-    A.draw("twopi", args="-Grotate=90 -Nshape=box")
-    assert stringify(A) == "strict graph { }"
+    A.draw_with_args("twopi", args="-Grotate=90 -Nshape=box")
+    del A.graph_attr["bb"]
+    del A.graph_attr["label"]
+    assert stringify(A) == "strict graph { graph [rotate=90]; node [shape=box]; }"
     A = pgv.AGraph(name="")
-    assert stringify(A) == "strict graph { [Graph rotate=90]; [Node shape=box] }"
+    assert stringify(A) == "strict graph { }"
 
 def test_simple2():
     A = pgv.AGraph(name="")

@@ -238,6 +238,9 @@ def agnameof(handle):
 def gvContext():
     return _graphviz.gvContext()
 
+def gvFinalize(gvc):
+    return _graphviz.gvFinalize(gvc)
+
 def gvFreeContext(gvc):
     return _graphviz.gvFreeContext(gvc)
 
