@@ -1538,8 +1538,15 @@ class AGraph:
             prog = prog.encode(self.encoding)
         return format, prog
 
-    def draw_with_args(self, path="ttt.dot", format="dot", prog="neato", args=""):
+    def draw_with_args(self, path=None, format="dot", prog="neato", args=""):
         format, prog = self.my_parse_args(args, format, prog)
+
+        if prog[:3] == b"nop":
+            print([(n,n.attr["pos"] is None) for n in self.nodes()])
+            if all((n.attr["pos"] is None) for n in self.nodes()):
+                raise AttributeError(
+                    """AGraph has no position(layout) information. Can't use prog="nop". """
+                )
 
         # Create a Context to render in
         gvc = gv.gvContext()
@@ -1554,13 +1561,18 @@ class AGraph:
 
         # Render
         if path is None:
-            path = sys.stdout
-        fh = self._get_fh(path, mode="wb")
-        err = gv.gvRender(gvc, G, format, fh)
-        if err:
-            raise ValueError("Graphviz raised a render error. Maybe bad format?")
-        if is_string_like(path):
-            fh.close()
+            ans = gv.gvRenderData(gvc, G, b"dot")
+            if ans[0]:
+                raise ValueError(f"Graphviz Error creating dot representation: {ans[0]}")
+            err, dot_string, length = ans
+            assert len(dot_string) == length
+        else:
+            fh = self._get_fh(path, mode="wb")
+            err = gv.gvRender(gvc, G, format, fh)
+            if err:
+                raise ValueError("Graphviz raised a render error. Maybe bad format?")
+            if is_string_like(path):
+                fh.close()
         gv.gvFreeLayout(gvc, G)
         gv.gvFreeContext(gvc)
 
@@ -1659,6 +1671,7 @@ class AGraph:
         >>> A.draw('file', format='png', prog='dot')
 
         """
+        return self.draw_with_args(path, format, prog, args)
         # try to guess format from extension
         if format is None and path is not None:
             p = path
@@ -1689,7 +1702,6 @@ class AGraph:
             arg_list = [arg.encode(self.encoding) for arg in arg_list]
             # first argument should be layout program: dot, neato, circo, etc...
             arg_list = [prog] + arg_list
-            print("Parse Args: ", arg_list)
             gv.gvParseArgs(gvc, arg_list)
             gv.gvLayoutJobs(gvc, G)
             gv.gvRenderJobs(gvc, G)
