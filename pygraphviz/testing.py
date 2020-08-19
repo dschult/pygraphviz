@@ -16,6 +16,6 @@ def stringify(agraph):
                 some = some.replace('[label="\\N", ', '[')
             else:
                 some = some.replace(', label="\\N"', '')
-        result = some.split()
+    result = some.split()
     return " ".join(result)
 

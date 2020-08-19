@@ -1,12 +1,6 @@
 import pygraphviz as pgv
 stringify = pgv.testing.stringify
 
-#def stringify(agraph):
-#    result = agraph.string().split()
-#    if '""' in result:
-#        result.remove('""')
-#    return " ".join(result)
-
 
 def test_default_attributes():
     A = pgv.AGraph()
@@ -18,7 +12,7 @@ def test_default_attributes():
     assert (
         sorted(list(A.graph_attr.iteritems())) == [("label", "test"), ("spam", "eggs")]
     )
-    ans = """strict graph { graph [label=test, spam=eggs ]; }"""
+    ans = """strict graph { graph [label=test, spam=eggs]; }"""
     assert stringify(A) == " ".join(ans.split())
 
     A.graph_attr["label"] = ""
@@ -34,7 +28,7 @@ def test_default_attributes():
 
 def test_graph_defaults():
     A = pgv.AGraph(rankdir="LR", pack="true")
-    ans = """strict graph { graph [pack=true, rankdir=LR ]; }"""
+    ans = """strict graph { graph [pack=true, rankdir=LR]; }"""
     assert stringify(A) == " ".join(ans.split())
 
 

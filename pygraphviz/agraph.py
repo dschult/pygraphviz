@@ -1492,7 +1492,6 @@ class AGraph:
             format = format.encode(self.encoding)
 
         gvc = gv.gvContext()
-        print("GVC ID: ", id(gvc))
         AG = self.copy()
         G = AG.handle
 
@@ -1569,7 +1568,6 @@ class AGraph:
         """args can create a sequence of layout and render jobs"""
 
         gvc = gv.gvContext()
-        print("GVC ID: ", id(gvc))
         print("self.graph_attr=",self.graph_attr)
 
         arg_list = shlex.split(args)
@@ -1681,7 +1679,6 @@ class AGraph:
             prog = prog.encode(self.encoding)
 
         gvc = gv.gvContext()
-        print("GVC ID: ", id(gvc))
         AG = self.copy()
         G = AG.handle
 
